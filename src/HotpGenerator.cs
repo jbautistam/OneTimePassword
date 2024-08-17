@@ -1,11 +1,11 @@
-﻿namespace Bau.Libraries.OneTimePassword.Generators;
+﻿namespace Bau.Libraries.OneTimePassword;
 
 /// <summary>
 ///		Generador de token basado en HMAC (HOTP) (https://datatracker.ietf.org/doc/html/rfc4226)
 /// </summary>
-public class Hotp : BaseOtp
+public class HotpGenerator : BaseTokenGenerator
 {
-    public Hotp(string secretKey, OneTimePasswordGenerator.HashAlgorithm hashAlgorithm, int digits = 6) : base(secretKey, hashAlgorithm, Math.Clamp(digits, 6, 8)) {}
+    public HotpGenerator(string secretKey, HashAlgorithm hashAlgorithm, int digits = 6) : base(secretKey, hashAlgorithm, Math.Clamp(digits, 6, 8)) {}
 
     /// <summary>
     ///     Calcula el token HOTP a partir de un contador

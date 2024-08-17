@@ -15,8 +15,8 @@ internal static class TimeCycle
     ///// </summary>
     //internal static DateTime GetNextCycleTimeUtc(DateTime dateTime, int seconds) => UnixTime.GetDateTime((UnixTime.GetUnixTime(dateTime) / seconds + 1) * seconds);
 
-    /// <summary>
-    ///     Obtiene el paso en el que se encuentra partir de una fecha y un intervalo (por ejemplo, obtiene valores 
-    /// </summary>
-    internal static long GetTimeStep(DateTime dateTime, int interval) => UnixTime.GetUnixTime(dateTime) / interval;
+    ///// <summary>
+    /////     Obtiene el paso en el que se encuentra partir de una fecha y un intervalo (por ejemplo, obtiene valores 
+    ///// </summary>
+    //internal static long GetTimeStep(DateTime dateTime, int interval) => UnixTime.GetUnixTime(dateTime) / interval;
 }

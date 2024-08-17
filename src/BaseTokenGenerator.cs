@@ -1,31 +1,44 @@
 ﻿using System.Security.Cryptography;
 using Bau.Libraries.OneTimePassword.TimeTools;
 
-namespace Bau.Libraries.OneTimePassword.Generators;
+namespace Bau.Libraries.OneTimePassword;
 
 /// <summary>
 ///     Cálculos básicos comunes para distintos generadores OTP
 /// </summary>
-public abstract class BaseOtp
+public abstract class BaseTokenGenerator
 {
-    public BaseOtp(string secret, OneTimePasswordGenerator.HashAlgorithm hashAlgorithm, int digits)
+    /// <summary>
+    ///     Algoritmo de Hash a utilizar para obtener el HMAC
+    /// </summary>
+    public enum HashAlgorithm
+    {
+        /// <summary>Algoritmo Sha1</summary>
+        Sha1,
+        /// <summary>Algoritmo Sha256</summary>
+        Sha256,
+        /// <summary>Algoritmo Sha512</summary>
+        Sha512
+    }
+
+    protected BaseTokenGenerator(string secret, HashAlgorithm algorithm, int digits)
     {
         Secret = secret;
-        HashAlgorithm = hashAlgorithm;
+        Algorithm = algorithm;
         Digits = digits;
     }
 
     /// <summary>
     ///     Calcula el token a partir de un valor
     /// </summary>
-    protected string ComputeToken(long value) => TruncateDigits(CalculateOtp(value.GetBigEndian(), HashAlgorithm), Digits);
+    protected string ComputeToken(long value) => TruncateDigits(ComputeOtp(value.GetBigEndian(), Algorithm), Digits);
 
     /// <summary>
     ///     Calcula el valor del token
     /// </summary>
-    private long CalculateOtp(byte[] data, OneTimePasswordGenerator.HashAlgorithm mode)
+    private long ComputeOtp(byte[] data, HashAlgorithm algorithm)
     {
-        byte[] hmacComputed = ComputeHmac(Secret, HashAlgorithm, data);
+        byte[] hmacComputed = ComputeHmac(Secret, algorithm, data);
         int offset = hmacComputed[hmacComputed.Length - 1] & 0x0F;
 
             // El RFC tiene un valor 19 fijo en la variable offset. Este método es similar, pero también sirve para SHA256 y SHA512
@@ -39,12 +52,12 @@ public abstract class BaseOtp
     /// <summary>
     ///     Trunca un número en X dígitos
     /// </summary>
-    protected string TruncateDigits(long value, int digits)
+    private string TruncateDigits(long value, int digits)
     {
-        int truncatedValue = (int) value % (int) Math.Pow(10, digits);
+        int truncated = (int) value % (int) Math.Pow(10, digits);
 
-            // Convierte en cadena y añade 0s a la izquierda
-            return truncatedValue.ToString().PadLeft(digits, '0');
+            // Convierte el número en cadena y añade 0s a la izquierda
+            return truncated.ToString().PadLeft(digits, '0');
     }
 
     /// <summary>
@@ -67,9 +80,9 @@ public abstract class BaseOtp
     /// <summary>
     ///     Utiliza el secreto para obtener un valor de hash utilizando el algoritmo espedificado
     /// </summary>
-    private byte[] ComputeHmac(string secret, OneTimePasswordGenerator.HashAlgorithm hashAlgorithm, byte[] data)
+    private byte[] ComputeHmac(string secret, HashAlgorithm algorithm, byte[] data)
     {
-        using (HMAC hmac = CreateHmacHash(HashAlgorithm))
+        using (HMAC hmac = CreateHmacHash(algorithm))
         {
             // Asigna la clave
             hmac.Key = System.Text.Encoding.UTF8.GetBytes(secret);
@@ -81,13 +94,13 @@ public abstract class BaseOtp
     /// <summary>
     ///     Crea un objeto para calcular el valor Hash (HMAC) dependiendo del algoritmo especificado
     /// </summary>
-    private HMAC CreateHmacHash(OneTimePasswordGenerator.HashAlgorithm hashAlgorithm)
+    private HMAC CreateHmacHash(HashAlgorithm algorithm)
     {
-        return hashAlgorithm switch
+        return algorithm switch
                     {
-                        OneTimePasswordGenerator.HashAlgorithm.Sha256 => new HMACSHA256(),
-                        OneTimePasswordGenerator.HashAlgorithm.Sha512 => new HMACSHA512(),
-                        _ => new HMACSHA1(),
+                        HashAlgorithm.Sha256 => new HMACSHA256(),
+                        HashAlgorithm.Sha512 => new HMACSHA512(),
+                        _ => new HMACSHA1()
                     };
     }
 
@@ -99,7 +112,7 @@ public abstract class BaseOtp
     /// <summary>
     ///     Algoritmo de Hash a utilizar
     /// </summary>
-    public OneTimePasswordGenerator.HashAlgorithm HashAlgorithm { get; }
+    public HashAlgorithm Algorithm { get; }
 
     /// <summary>
     ///     Número de dígitos que debe tener el token devuelto
