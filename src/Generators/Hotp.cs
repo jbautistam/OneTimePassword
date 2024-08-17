@@ -10,10 +10,10 @@ public class Hotp : BaseOtp
     /// <summary>
     ///     Calcula el token HOTP a partir de un contador
     /// </summary>
-    public string ComputeHOTP(long counter) => Compute(counter);
+    public string Compute(long counter) => ComputeToken(counter);
 
     /// <summary>
     ///     Verifica un token (utiliza un algoritmo que siempre tarda el mismo tiempo)
     /// </summary>
-    public bool VerifyHotp(string hotp, long counter) => ValuesEqual(hotp, ComputeHOTP(counter));
+    public bool Verify(string token, long counter) => ValuesEqual(token, Compute(counter));
 }

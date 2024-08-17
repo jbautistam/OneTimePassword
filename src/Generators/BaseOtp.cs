@@ -18,7 +18,7 @@ public abstract class BaseOtp
     /// <summary>
     ///     Calcula el token a partir de un valor
     /// </summary>
-    protected string Compute(long value) => TruncateDigits(CalculateOtp(value.GetBigEndian(), HashAlgorithm), Digits);
+    protected string ComputeToken(long value) => TruncateDigits(CalculateOtp(value.GetBigEndian(), HashAlgorithm), Digits);
 
     /// <summary>
     ///     Calcula el valor del token

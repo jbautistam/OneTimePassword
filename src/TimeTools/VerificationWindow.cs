@@ -34,11 +34,6 @@ public class VerificationWindow
     }
 
     /// <summary>
-    /// The verification window that accommodates network delay that is recommended in the RFC
-    /// </summary>
-    public static readonly VerificationWindow RfcSpecifiedNetworkDelay = new VerificationWindow();
-
-    /// <summary>
     ///     Número de frames anteriores
     /// </summary>
     public int Previous { get; }

@@ -14,9 +14,10 @@ public class OneTimePasswordGenerator_Should
     private const string Rfc6238SecretSha512 = "1234567890123456789012345678901234567890123456789012345678901234";
 
     /// <summary>
-    ///     Calcula diferentes tokens
+    ///     Comprueba la generación de diferentes tokens TOTP
     /// </summary>
     [Theory]
+    // [InlineData("IZ6E24YV6MREE5DM", OneTimePasswordGenerator.HashAlgorithm.Sha1, 0, "890009")]
     [InlineData(Rfc6238SecretSha1, OneTimePasswordGenerator.HashAlgorithm.Sha1, 59, "94287082")]
     [InlineData(Rfc6238SecretSha256, OneTimePasswordGenerator.HashAlgorithm.Sha256, 59, "46119246")]
     [InlineData(Rfc6238SecretSha512, OneTimePasswordGenerator.HashAlgorithm.Sha512, 59, "90693936")]
@@ -42,9 +43,9 @@ public class OneTimePasswordGenerator_Should
     {
         OneTimePasswordGenerator generator = new(secret, algorithm);
 
-            // Comprueba el resultado
             generator.ComputeTotp(timestamp, 30, expected.Length).Should().Be(expected);
     }
+
     /// <summary>
     ///     Comprueba la generación de Hotp
     /// </summary>

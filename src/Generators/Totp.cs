@@ -7,8 +7,6 @@ namespace Bau.Libraries.OneTimePassword.Generators;
 /// </summary>
 public class Totp : BaseOtp
 {
-    public Totp(string secret, OneTimePasswordGenerator.HashAlgorithm hashAlgorithm, int digits) : base(secret, hashAlgorithm, digits) {}
-
     /// <summary>
     /// The number of ticks as Measured at Midnight Jan 1st 1970;
     /// </summary>
@@ -19,10 +17,12 @@ public class Totp : BaseOtp
     /// </summary>
     private const long TicksToSeconds = 10000000L;
 
+    public Totp(string secret, OneTimePasswordGenerator.HashAlgorithm hashAlgorithm, int digits) : base(secret, hashAlgorithm, digits) {}
+
     /// <summary>
     ///     Genera el token a partir de una fecha
     /// </summary>
-    public string ComputeTotp(DateTime? timestamp = null) => Compute(CalculateTimeStepFromTimestamp(GetCorrectedTime(timestamp)));
+    public string Compute(DateTime? timestamp = null) => ComputeToken(CalculateTimeStepFromTimestamp(GetCorrectedTime(timestamp)));
 
     /// <summary>
     ///     Calcula el intervalo en el que está a partir de la hora
@@ -30,31 +30,34 @@ public class Totp : BaseOtp
     private long CalculateTimeStepFromTimestamp(DateTime timestamp) => TimeCycle.GetTimeStep(timestamp, Interval);
 
     /// <summary>
-    ///     Aplica el factor de corrección a la fecha de sistema
+    ///     Aplica el factor de corrección a una fecha
     /// </summary>
     private DateTime GetCorrectedTime(DateTime? reference = null) => (reference ?? DateTime.UtcNow) - TimeCorrectionFactor;
 
     /// <summary>
+    ///     Segundos restantes en la ventana de tiempo actual
+    /// </summary>
+    public int RemainingSeconds(DateTime? timestamp = null) => Interval - ((int) ((GetCorrectedTime(timestamp).Ticks - UnicEpocTicks) / TicksToSeconds)) % Interval;
+
+    /// <summary>
+    ///     Inicio del intervalo de tiempo
+    /// </summary>
+    public DateTime WindowStart(DateTime? timestamp = null)
+    {
+        DateTime corrected = GetCorrectedTime(timestamp);
+
+            return corrected.AddTicks(-(corrected.Ticks - UnicEpocTicks) % (TicksToSeconds * Interval));
+    }
+
+    /// <summary>
     /// Verify a value that has been provided with the calculated value.
     /// </summary>
-    public bool VerifyTotp(string totp, out long timeStepMatched, VerificationWindow? window = null) =>
-        VerifyTotpForSpecificTime(GetCorrectedTime(), totp, window, out timeStepMatched);
+    public bool VerifyTotp(string totp, out long timeStepMatched, VerificationWindow? window = null) => VerifyTotpForSpecificTime(GetCorrectedTime(), totp, window, out timeStepMatched);
 
     /// <summary>
     /// Verify a value that has been provided with the calculated value
     /// </summary>
-    public bool VerifyTotp(DateTime timestamp, string totp, out long timeStepMatched, VerificationWindow? window = null) =>
-        VerifyTotpForSpecificTime(GetCorrectedTime(timestamp), totp, window, out timeStepMatched);
-
-    /// <summary>
-    /// Remaining seconds in current window
-    /// </summary>
-    public int RemainingSeconds(DateTime? timestamp = null) => RemainingSecondsForSpecificTime(GetCorrectedTime(timestamp));
-
-    /// <summary>
-    /// Start of the current window
-    /// </summary>
-    public DateTime WindowStart(DateTime? timestamp = null) => WindowStartForSpecificTime(GetCorrectedTime(timestamp));
+    public bool VerifyTotp(DateTime timestamp, string totp, out long timeStepMatched, VerificationWindow? window = null) => VerifyTotpForSpecificTime(GetCorrectedTime(timestamp), totp, window, out timeStepMatched);
 
     private bool VerifyTotpForSpecificTime(DateTime timestamp, string totp, VerificationWindow? window, out long timeStepMatched)
     {
@@ -65,13 +68,13 @@ public class Totp : BaseOtp
     /// <summary>
     ///     Verifica un token
     /// </summary>
-    protected bool Verify(long initialStep, string valueToVerify, out long matchedStep, VerificationWindow? window)
+    private bool Verify(long initialStep, string valueToVerify, out long matchedStep, VerificationWindow? window)
     {
         window = window ?? new VerificationWindow();
         
         foreach (long frame in window.ValidationCandidates(initialStep))
         {
-            string comparisonValue = Compute(frame);
+            string comparisonValue = ComputeToken(frame);
 
             if (ValuesEqual(comparisonValue, valueToVerify))
             {
@@ -83,12 +86,6 @@ public class Totp : BaseOtp
         matchedStep = 0;
         return false;
     }
-
-    private int RemainingSecondsForSpecificTime(DateTime timestamp) =>
-        Interval - (int)(((timestamp.Ticks - UnicEpocTicks) / TicksToSeconds) % Interval);
-
-    private DateTime WindowStartForSpecificTime(DateTime timestamp) =>
-        timestamp.AddTicks(-(timestamp.Ticks - UnicEpocTicks) % (TicksToSeconds * Interval));
 
     /// <summary>
     ///     Segundos de la ventana de tiempo de generación de tokens

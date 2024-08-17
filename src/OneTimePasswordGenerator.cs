@@ -43,7 +43,18 @@ public class OneTimePasswordGenerator
 		Generators.Totp totp = new(Secret, Algorithm, length);
 
             totp.Interval = interval;
-            return totp.ComputeTotp(TimeTools.UnixTime.GetDateTime(timestamp));
+            return totp.Compute(TimeTools.UnixTime.GetDateTime(timestamp));
+	}
+
+    /// <summary>
+    ///     Calcula un token utilizando TOTP
+    /// </summary>
+	public string ComputeTotp(DateTime? time = null, int interval = 30, int length = 5)
+	{
+		Generators.Totp totp = new(Secret, Algorithm, length);
+
+            totp.Interval = interval;
+            return totp.Compute(time);
 	}
 
     /// <summary>
@@ -53,7 +64,7 @@ public class OneTimePasswordGenerator
 	{
 		Generators.Hotp hotp = new(Secret, Algorithm, length);
 
-            return hotp.ComputeHOTP(counter);
+            return hotp.Compute(counter);
 	}
 
     /// <summary>
