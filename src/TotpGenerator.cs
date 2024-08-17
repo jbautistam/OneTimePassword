@@ -7,22 +7,12 @@ namespace Bau.Libraries.OneTimePassword;
 /// </summary>
 public class TotpGenerator : BaseTokenGenerator
 {
-    /// <summary>
-    /// The number of ticks as Measured at Midnight Jan 1st 1970;
-    /// </summary>
-    private const long UnicEpocTicks = 621355968000000000L;
-
-    /// <summary>
-    /// A divisor for converting ticks to seconds
-    /// </summary>
-    private const long TicksToSeconds = 10000000L;
-
     public TotpGenerator(string secret, HashAlgorithm hashAlgorithm, int digits) : base(secret, hashAlgorithm, digits) {}
 
     /// <summary>
     ///     Genera el token a partir de un un timestamp
     /// </summary>
-    public string Compute(long timestamp) => Compute(UnixTime.GetDateTime(timestamp));
+    public string Compute(long timestamp) => ComputeToken(TimeManager.GetTimeStep(timestamp));
 
     /// <summary>
     ///     Genera el token a partir de una fecha
@@ -30,51 +20,44 @@ public class TotpGenerator : BaseTokenGenerator
     public string Compute(DateTime? timestamp = null) => ComputeToken(TimeManager.GetTimeStep(timestamp));
 
     /// <summary>
-    ///     Inicio del intervalo de tiempo
+    ///     Verifica un token con respecto al valor calculado
     /// </summary>
-    public DateTime WindowStart(DateTime? timestamp = null)
-    {
-        DateTime corrected = TimeManager.GetCorrectedTime(timestamp);
-
-            return corrected.AddTicks(-(corrected.Ticks - UnicEpocTicks) % (TicksToSeconds * TimeManager.IntervalSeconds));
-    }
+    public (bool verified, long matchedStep) Verify(string totp, int previous = 1, int future = 1) => Verify(DateTime.UtcNow, totp, previous, future);
 
     /// <summary>
-    /// Verify a value that has been provided with the calculated value.
+    ///     Verifica un token con respecto al valor calculado
     /// </summary>
-    public bool VerifyTotp(string totp, out long timeStepMatched, VerificationWindow? window = null) => VerifyTotpForSpecificTime(DateTime.UtcNow, totp, window, out timeStepMatched);
-
-    /// <summary>
-    /// Verify a value that has been provided with the calculated value
-    /// </summary>
-    public bool VerifyTotp(DateTime timestamp, string totp, out long timeStepMatched, VerificationWindow? window = null) => VerifyTotpForSpecificTime(timestamp, totp, window, out timeStepMatched);
-
-    private bool VerifyTotpForSpecificTime(DateTime timestamp, string totp, VerificationWindow? window, out long timeStepMatched)
+    public (bool verified, long matchedStep) Verify(DateTime timestamp, string totp, int previous = 1, int future = 1)
     {
         long initialStep = TimeManager.GetTimeStep(timestamp);
-        return Verify(initialStep, totp, out timeStepMatched, window);
+
+            // Genera y valida cadan uno de los frames de la ventana        
+            foreach (long frame in ValidationCandidates(initialStep, previous, future))
+                if (ValuesEqual(ComputeToken(frame), totp))
+                    return (true, frame);
+            // Devuelve el valor que indica que la validación es incorrecta
+            return (false, -1);
     }
 
     /// <summary>
-    ///     Verifica un token
+    ///     Enumera todos los candidatos a validar
     /// </summary>
-    private bool Verify(long initialStep, string valueToVerify, out long matchedStep, VerificationWindow? window)
+    private IEnumerable<long> ValidationCandidates(long initialStep, int previous, int future)
     {
-        window = window ?? new VerificationWindow();
-        
-        foreach (long frame in window.ValidationCandidates(initialStep))
+        // Devuelve el frame actual
+        yield return initialStep;
+        // Devuelve los frames anteriores
+        for (int index = 1; index <= previous; index++)
         {
-            string comparisonValue = ComputeToken(frame);
+            long actual = initialStep - index;
 
-            if (ValuesEqual(comparisonValue, valueToVerify))
-            {
-                matchedStep = frame;
-                return true;
-            }
+                // siempre y cuando sean válidos
+                if (actual >= 0)
+                    yield return actual;
         }
-
-        matchedStep = 0;
-        return false;
+        // Devuelve los frames siguientes
+        for (int index = 1; index <= future; index++)
+            yield return initialStep + index;
     }
 
     /// <summary>
