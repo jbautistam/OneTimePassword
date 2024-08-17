@@ -4,9 +4,9 @@ using Bau.Libraries.OneTimePassword;
 namespace OtpNet.Test;
 
 /// <summary>
-///     Pruebas de <see cref="Bau.Libraries.OneTimePassword.Generators.Hotp"/> y <see cref="Bau.Libraries.OneTimePassword.Generators.Totp"/>
+///     Pruebas de <see cref="TotpGenerator"/>
 /// </summary>
-public class OneTimePasswordGenerator_Should
+public class TotpGenerator_Should
 {
     // Secretos para los diferentes algorigmos
     private const string Rfc6238SecretSha1 = "12345678901234567890";
@@ -17,7 +17,6 @@ public class OneTimePasswordGenerator_Should
     ///     Comprueba la generación de diferentes tokens TOTP
     /// </summary>
     [Theory]
-    // [InlineData("IZ6E24YV6MREE5DM", OneTimePasswordGenerator.HashAlgorithm.Sha1, 0, "890009")]
     [InlineData(Rfc6238SecretSha1, BaseTokenGenerator.HashAlgorithm.Sha1, 59, "94287082")]
     [InlineData(Rfc6238SecretSha256, BaseTokenGenerator.HashAlgorithm.Sha256, 59, "46119246")]
     [InlineData(Rfc6238SecretSha512, BaseTokenGenerator.HashAlgorithm.Sha512, 59, "90693936")]
@@ -47,27 +46,5 @@ public class OneTimePasswordGenerator_Should
             totp.TimeManager.IntervalSeconds = 30;
             // Comprueba el resultado
             totp.Compute(timestamp).Should().Be(expected);
-    }
-
-    /// <summary>
-    ///     Comprueba la generación de Hotp
-    /// </summary>
-    [Theory]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 0, "755224")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 1, "287082")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 2, "359152")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 3, "969429")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 4, "338314")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 5, "254676")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 6, "287922")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 7, "162583")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 8, "399871")]
-    [InlineData(BaseTokenGenerator.HashAlgorithm.Sha1, 9, "520489")]
-    public void compute_Hotp(BaseTokenGenerator.HashAlgorithm hash, long counter, string expected)
-    {
-        HotpGenerator hotp = new(Rfc6238SecretSha1, hash, expected.Length);
-
-            // Comprueba el resultado
-            hotp.Compute(counter).Should().Be(expected);
     }
 }

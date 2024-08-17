@@ -8,27 +8,27 @@ public class TotpTimeManager
     // Constantes privadas
     private static readonly DateTime Epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc); // Fecha de inicio de la hora Unix / Posix
     private static readonly long EpochTicks = Epoch.Ticks; // Número de ticks desde la medianoche del 1-1-1970 (Unix epoc)
-    private const long TicksToSeconds = 10_000_000L; // Diviros para convertir ticks a segundos
+    private const long TicksToSeconds = 10_000_000L; // Divisor para convertir ticks a segundos
 
     /// <summary>
-    ///     Obtiene el paso en el que se encuentra partir de una fecha y un intervalo (por ejemplo, obtiene valores 
+    ///     Obtiene el paso en el que se encuentra partir de los ticks de Unix
     /// </summary>
     internal long GetTimeStep(long timestamp) => timestamp / IntervalSeconds;
 
     /// <summary>
-    ///     Obtiene el paso en el que se encuentra partir de una fecha y un intervalo (por ejemplo, obtiene valores 
+    ///     Obtiene el paso en el que se encuentra partir de una fecha
     /// </summary>
     internal long GetTimeStep(DateTime? timestamp = null) => GetTimeStep(GetUnixTime(GetCorrectedTime(timestamp)));
 
     /// <summary>
     ///     Convierte una fecha a tiempo Unix
     /// </summary>
-    internal long GetUnixTime(DateTime dateTime) => (long) (dateTime - Epoch).TotalSeconds;
+    private long GetUnixTime(DateTime timestamp) => (long) (timestamp - Epoch).TotalSeconds;
 
     /// <summary>
     ///     Aplica el factor de corrección a una fecha
     /// </summary>
-    internal DateTime GetCorrectedTime(DateTime? timestamp = null) => (timestamp ?? DateTime.UtcNow) - TimeCorrectionFactor;
+    private DateTime GetCorrectedTime(DateTime? timestamp = null) => (timestamp ?? DateTime.UtcNow) - TimeCorrectionFactor;
 
     /// <summary>
     ///     Inicio del intervalo de tiempo

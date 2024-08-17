@@ -22,18 +22,18 @@ public class TotpGenerator : BaseTokenGenerator
     /// <summary>
     ///     Verifica un token con respecto al valor calculado
     /// </summary>
-    public (bool verified, long matchedStep) Verify(string totp, int previous = 1, int future = 1) => Verify(DateTime.UtcNow, totp, previous, future);
+    public (bool verified, long matchedStep) Verify(string token, int previous = 1, int future = 1) => Verify(DateTime.UtcNow, token, previous, future);
 
     /// <summary>
     ///     Verifica un token con respecto al valor calculado
     /// </summary>
-    public (bool verified, long matchedStep) Verify(DateTime timestamp, string totp, int previous = 1, int future = 1)
+    public (bool verified, long matchedStep) Verify(DateTime timestamp, string token, int previous = 1, int future = 1)
     {
         long initialStep = TimeManager.GetTimeStep(timestamp);
 
             // Genera y valida cadan uno de los frames de la ventana        
             foreach (long frame in ValidationCandidates(initialStep, previous, future))
-                if (ValuesEqual(ComputeToken(frame), totp))
+                if (ValuesEqual(ComputeToken(frame), token))
                     return (true, frame);
             // Devuelve el valor que indica que la validación es incorrecta
             return (false, -1);
