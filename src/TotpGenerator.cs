@@ -7,7 +7,11 @@ namespace Bau.Libraries.OneTimePassword;
 /// </summary>
 public class TotpGenerator : BaseTokenGenerator
 {
-    public TotpGenerator(string secret, HashAlgorithm hashAlgorithm, int digits) : base(secret, hashAlgorithm, digits) {}
+    public TotpGenerator(string key, HashAlgorithm hashAlgorithm, int digits) : this(new Secret(key), hashAlgorithm, digits) {}
+
+    public TotpGenerator(string key, Secret.Encoding encoding, HashAlgorithm hashAlgorithm, int digits) : this(new Secret(key, encoding), hashAlgorithm, digits) {}
+
+    public TotpGenerator(Secret secret, HashAlgorithm hashAlgorithm, int digits) : base(secret, hashAlgorithm, digits) {}
 
     /// <summary>
     ///     Genera el token a partir de un un timestamp
@@ -33,7 +37,7 @@ public class TotpGenerator : BaseTokenGenerator
 
             // Genera y valida cadan uno de los frames de la ventana        
             foreach (long frame in ValidationCandidates(initialStep, previous, future))
-                if (ValuesEqual(ComputeToken(frame), token))
+                if (CompareTokens(ComputeToken(frame), token))
                     return (true, frame);
             // Devuelve el valor que indica que la validación es incorrecta
             return (false, -1);

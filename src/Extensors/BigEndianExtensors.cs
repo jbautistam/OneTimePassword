@@ -9,12 +9,12 @@ internal static class BigEndianExtensors
     /// <summary>
     ///     Convierte un long en un array big endian (RFC 4226) 
     /// </summary>
-    internal static byte[] GetBigEndian(this long input) => Reverse(BitConverter.GetBytes(input));
+    internal static byte[] ToBigEndian(this long input) => Reverse(BitConverter.GetBytes(input));
 
     /// <summary>
     ///     Convierte un int en un array big endian (RFC 4226)
     /// </summary>
-    internal static byte[] GetBigEndian(this int input) => Reverse(BitConverter.GetBytes(input));
+    internal static byte[] ToBigEndian(this int input) => Reverse(BitConverter.GetBytes(input));
 
     /// <summary>
     ///     Da la vuelta a un array de bytes

@@ -5,7 +5,11 @@
 /// </summary>
 public class HotpGenerator : BaseTokenGenerator
 {
-    public HotpGenerator(string secretKey, HashAlgorithm hashAlgorithm, int digits = 6) : base(secretKey, hashAlgorithm, Math.Clamp(digits, 6, 8)) {}
+    public HotpGenerator(string key, HashAlgorithm hashAlgorithm, int digits = 6) : this(new Secret(key), hashAlgorithm, digits) {}
+
+    public HotpGenerator(string key, Secret.Encoding encoding, HashAlgorithm hashAlgorithm, int digits = 6) : this(new Secret(key, encoding), hashAlgorithm, digits) {}
+
+    public HotpGenerator(Secret secret, HashAlgorithm hashAlgorithm, int digits = 6) : base(secret, hashAlgorithm, Math.Clamp(digits, 6, 8)) {}
 
     /// <summary>
     ///     Calcula el token HOTP a partir de un contador
@@ -15,5 +19,5 @@ public class HotpGenerator : BaseTokenGenerator
     /// <summary>
     ///     Verifica un token (utiliza un algoritmo que siempre tarda el mismo tiempo)
     /// </summary>
-    public bool Verify(string token, long counter) => ValuesEqual(token, Compute(counter));
+    public bool Verify(string token, long counter) => CompareTokens(token, Compute(counter));
 }

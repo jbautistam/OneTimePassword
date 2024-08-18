@@ -1,4 +1,4 @@
-﻿namespace Bau.Libraries.OneTimeToken.Encoders;
+﻿namespace Bau.Libraries.OneTimePassword.Encoders;
 
 /// <summary>
 ///		Codificación de una cadena a Base32 basado en RFC 3548/4648 que utiliza el alfabeto "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"

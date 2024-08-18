@@ -4,7 +4,7 @@ using Bau.Libraries.OneTimePassword.TimeTools;
 namespace Bau.Libraries.OneTimePassword;
 
 /// <summary>
-///     Cálculos básicos comunes para distintos generadores OTP
+///     Clase base para los diferentes generadores de OTP
 /// </summary>
 public abstract class BaseTokenGenerator
 {
@@ -21,7 +21,7 @@ public abstract class BaseTokenGenerator
         Sha512
     }
 
-    protected BaseTokenGenerator(string secret, HashAlgorithm algorithm, int digits)
+    protected BaseTokenGenerator(Secret secret, HashAlgorithm algorithm, int digits)
     {
         Secret = secret;
         Algorithm = algorithm;
@@ -31,12 +31,12 @@ public abstract class BaseTokenGenerator
     /// <summary>
     ///     Calcula el token a partir de un valor
     /// </summary>
-    protected string ComputeToken(long value) => TruncateDigits(ComputeOtp(value.GetBigEndian(), Algorithm), Digits);
+    protected string ComputeToken(long value) => TruncateDigits(Compute(value.ToBigEndian(), Algorithm), Digits);
 
     /// <summary>
     ///     Calcula el valor del token
     /// </summary>
-    private long ComputeOtp(byte[] data, HashAlgorithm algorithm)
+    private long Compute(byte[] data, HashAlgorithm algorithm)
     {
         byte[] hmacComputed = ComputeHmac(Secret, algorithm, data);
         int offset = hmacComputed[hmacComputed.Length - 1] & 0x0F;
@@ -63,7 +63,7 @@ public abstract class BaseTokenGenerator
     /// <summary>
     ///     Comparación de cadenas utilizando siempre el mismo tiempo para evitar ataques
     /// </summary>
-    protected bool ValuesEqual(string first, string second)
+    protected bool CompareTokens(string first, string second)
     {
         int result = 0;
 
@@ -80,12 +80,12 @@ public abstract class BaseTokenGenerator
     /// <summary>
     ///     Utiliza el secreto para obtener un valor de hash utilizando el algoritmo espedificado
     /// </summary>
-    private byte[] ComputeHmac(string secret, HashAlgorithm algorithm, byte[] data)
+    private byte[] ComputeHmac(Secret secret, HashAlgorithm algorithm, byte[] data)
     {
-        using (HMAC hmac = CreateHmacHash(algorithm))
+        using (HMAC hmac = GetHmac(algorithm))
         {
             // Asigna la clave
-            hmac.Key = System.Text.Encoding.UTF8.GetBytes(secret);
+            hmac.Key = secret.Decode();
             // Calcula el valor hash
             return hmac.ComputeHash(data);
         }
@@ -94,7 +94,7 @@ public abstract class BaseTokenGenerator
     /// <summary>
     ///     Crea un objeto para calcular el valor Hash (HMAC) dependiendo del algoritmo especificado
     /// </summary>
-    private HMAC CreateHmacHash(HashAlgorithm algorithm)
+    private HMAC GetHmac(HashAlgorithm algorithm)
     {
         return algorithm switch
                     {
@@ -107,7 +107,7 @@ public abstract class BaseTokenGenerator
     /// <summary>
     ///     Secreto
     /// </summary>
-    public string Secret { get; }
+    public Secret Secret { get; }
 
     /// <summary>
     ///     Algoritmo de Hash a utilizar
