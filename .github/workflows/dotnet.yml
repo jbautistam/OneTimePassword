@@ -28,7 +28,7 @@ jobs:
         run: dotnet build --configuration Release src/OneTimePassword.csproj
 
       - name: Create the package
-        run: dotnet pack --configuration Release src/OneTimePassword.csproj -p:PackageVersion=1.1.$GITHUB_RUN_NUMBER
+        run: dotnet pack --name Bau.Libraries.OneTimePassword --configuration Release src/OneTimePassword.csproj -p:PackageVersion=1.0.$GITHUB_RUN_NUMBER
 
       - name: Publish the package to Nuget
         run: dotnet nuget push src/bin/Release/*.nupkg --no-symbols --api-key ${{secrets.NUGET_TOKEN}}
