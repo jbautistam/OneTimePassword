@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\OneTimePassword\OneTimePassword.csproj" />
+    <ProjectReference Include="..\..\src\OneTimePassword\OneTimePassword.csproj" />
   </ItemGroup>
 
 </Project>
