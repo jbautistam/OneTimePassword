@@ -35,15 +35,16 @@ Existen varios algoritmos para la generación de claves OTP, esta librería genera
 ### Algoritmo HOTP (HMAC-Based One-Time Password) 
 
 HOTP es un método de autenticación que genera contraseñas únicas y temporales utilizando una clave secreta compartida y un contador. 
-Este algoritmo es una parte fundamental de la iniciativa OATH (Initiative for Open Authentication) y publicado como 
-[RFC 4226](http://tools.ietf.org/html/rfc4226) en 2005.
+Este algoritmo es una parte fundamental de la iniciativa OATH (Initiative for Open Authentication). 
+
+Se puede ver su especificación en el documento [RFC 4226](http://tools.ietf.org/html/rfc4226).
 
 **Características clave del algoritmo HOTP:**
 
 * **Clave secreta compartida:** ambas partes (el servidor y la aplicación de autenticación) comparten una clave secreta que se utiliza para generar las contraseñas OTP.
 * **Contador:** se incrementa un contador cada vez que se genera una nueva contraseña OTP. Este contador asegura que cada contraseña sea única.
 * **Función HMAC:** la clave secreta y el valor del contador se procesan utilizando una función HMAC (Hash-based Message Authentication Code) para generar la contraseña OTP.
-* **Generación de OTP:** la contraseña OTP se genera combinando la clave secreta y el valor del contador, y luego se trunca el resultado para ofreces un 
+* **Generación de OTP:** la contraseña OTP se genera combinando la clave secreta y el valor del contador, y luego se trunca el resultado para ofrecer un 
 formato más amigable para el usuario, generalmente un número de 6 a 8 dígitos.
 
 **Proceso de funcionamiento del algoritmo HOTP:**
@@ -59,13 +60,13 @@ contador actual, y comparándola con la proporcionada por el usuario.
 **Ventajas del algoritmo HOTP:**
 
 * **Seguridad:** las contraseñas OTP son únicas y temporales, lo que las hace más seguras que las contraseñas estáticas.
-* **Flexibilidad:** puede utilizarse en una variedad de aplicaciones, incluyendo autenticación en línea y transacciones financieras.
+* **Flexibilidad:** puede utilizarse en una amplia gama de aplicaciones.
  
 **Desventajas del algoritmo HOTP:**
 
-* **Problema de sincronización:** Si los contadores del servidor y la aplicación de autenticación se desincronizan, puede requerir un protocolo
+* **Problema de sincronización:** si los contadores del servidor y la aplicación de autenticación se desincronizan, puede requerir un protocolo
 de resincronización para resolver el problema.
-* **No tiene período de expiración:** Las contraseñas OTP generadas por HOTP son válidas hasta que se utilice la siguiente, lo que puede 
+* **No tiene período de expiración:** las contraseñas OTP generadas por HOTP son válidas hasta que se utilice la siguiente, lo que puede 
 ser un problema de seguridad si no se utiliza inmediatamente.
 
 ### Algoritmo TOTP (Time-Based One-Time Password) 
@@ -73,6 +74,8 @@ ser un problema de seguridad si no se utiliza inmediatamente.
 TOTP es un método de autenticación que genera contraseñas únicas y temporales basadas en la clave secreta compartida y la 
 hora actual. Este algoritmo es una variante del algoritmo HOTP (HMAC-Based One-Time Password) y se utiliza ampliamente 
 en la autenticación de dos factores (2FA).
+
+Se puede ver su especificación en el documento [RFC 6238](http://tools.ietf.org/html/rfc6238).
 
 **Características clave del algoritmo TOTP:**
 
@@ -85,8 +88,8 @@ para generar la contraseña OTP.
 
 **Proceso de funcionamiento del algoritmo TOTP:**
 
-* **Inicialización:** el servidor y la aplicación de autenticación acuerdan una clave secreta y un tiempo inicial. Lo normal es utilizar la constante EPOCH utilizada
-para las fechas en Unix: número de ticks desde el 1-1-1970.
+* **Inicialización:** el servidor y la aplicación de autenticación acuerdan una clave secreta y un tiempo inicial. Lo normal es utilizar la constante EPOCH 
+de Unix: número de ticks desde el 1-1-1970.
 * **Generación de OTP:** cuando se necesita una contraseña OTP, la aplicación de autenticación combina la clave secreta y la hora actual
 y aplica la función HMAC para generar una contraseña OTP.
 * **Truncamiento:** la salida de la función HMAC se trunca para obtener una contraseña OTP de 6 a 8 dígitos.
@@ -118,7 +121,7 @@ Para generar una clave HOTP utilizaremos la clase `HotpGenerator`. En el constru
 * `Algorithm`: algoritmo de hashing utilizado para obtener los códigos resultantes (Sha1, Sah128, Sha256). El valor habitual es SHA1.
 * `Digits`: número de caracteres generados por el código (de 6 a 8, lo habitual es 6).
 
-Una vez inicializa la clase, simplemente llamando al método `Compute` con el contador adecuado para obtener el código de validación:
+Una vez inicializada la clase, llamando al método `Compute` con el contador adecuado accedemos al código de validación:
 
 ```csharp
 using Bau.Libraries.OneTimePassword;
@@ -130,14 +133,14 @@ string code = hotp.Compute(19238);
 
 ### Generación de una clave TOTP
 
-Para generar una clave tOTP utilizaremos la clase `TotpGenerator`. En el constructor debemos indicar:
+Para generar una clave TOTP utilizaremos la clase `TotpGenerator`. En el constructor debemos indicar:
 
 * `Key`: clave devuelta por el servidor de claves.
 * `Encoding`: modo de codificación de la clave devuelta por el servidor de claves (texto plano, Base64 o Base32).
 * `Algorithm`: algoritmo de hashing utilizado para obtener los códigos resultantes (Sha1, Sah128, Sha256). El valor habitual es SHA1.
 * `Digits`: número de caracteres generados por el código (de 6 a 8, lo habitual es 6).
 
-Una vez inicializa la clase, simplemente llamando al método `Compute` para obtener el código de validación:
+Una vez inicializada la clase, llamando al método `Compute` obtenemo el código de validación:
 
 ```csharp
 using Bau.Libraries.OneTimePassword;
@@ -147,14 +150,14 @@ TotpGenerator totp = new("KEY", Secret.Encoding.Plain, BaseTokenGenerator.HashAl
 string code = totp.Compute();
 ```
 
-En este caso, si no le pasamos ninguna fecha, se utiliza la fecha del sistema pero le podemos pasar tanto una fecha en
-concreto como `DateTime`:
+En este caso, si no le pasamos ninguna fecha, se utiliza la fecha del sistema pero le podemos indicar una fecha en
+concreto:
 
 ```csharp
 string code = totp.Compute(new DateTime(2024, 8, 2, 17, 30, 5));
 ```
 
-como un valor `long` especificando la fecha Unix (número de ticks desde el 1-1-1970):
+o bien utilizar `long` especificando la fecha Unix (número de ticks desde el 1-1-1970):
 
 ```csharp
 string code = totp.Compute(1_991_289);
@@ -175,11 +178,11 @@ string code = totp.Compute();
 ### Tiempo de validez de la clave
 
 Los códigos generados por `TotpGenerator` son válidos durante treinta segundos o el intervalo especificado, pero este
-tiempo se mide no desde la generación si no desde el inicio del intervalo, es decir, si generamos el código a las 12:05, el
-inicio de la ventana de generación será 12:00 y nos quedarán veinticinco segundos de validez.
+tiempo se mide no desde la generación del código si no desde el inicio del intervalo de la fecha especificada. 
+Es decir, si generamos el código a las 12:05, el inicio de la ventana de generación será 12:00 y nos quedarán veinticinco segundos de validez.
 
-Para comprobar el tiempo que nos queda de validez del código por ejemplo para mostrarlo en una aplicación, podemos utilizar
-el método `GetRemainingSeconds` de clase `TopTimeManager` donde se agrupan los métodos relacionados con la fecha:
+Para comprobar el tiempo que nos queda de validez del código (por ejemplo para mostrarlo en una aplicación) podemos utilizar
+el método `GetRemainingSeconds` de la clase `TopTimeManager` donde se agrupan los métodos relacionados con la fecha:
 
 ```c#
 using Bau.Libraries.OneTimePassword;
