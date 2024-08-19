@@ -1,6 +1,6 @@
 # OneTimePassword
 
-Implementación de los algoritmos TOTP ([RFC 6238](http://tools.ietf.org/html/rfc6238)) y HOTP [RFC 4226](http://tools.ietf.org/html/rfc4226)
+Implementación de los algoritmos TOTP ([RFC 6238](http://tools.ietf.org/html/rfc6238)) y HOTP ([RFC 4226](http://tools.ietf.org/html/rfc4226))
 para generación de contraseñas de un único uso con C#.
 
 [![Publish package](https://github.com/jbautistam/OneTimePassword/actions/workflows/dotnet.yml/badge.svg)](https://github.com/jbautistam/OneTimePassword/actions/workflows/dotnet.yml)

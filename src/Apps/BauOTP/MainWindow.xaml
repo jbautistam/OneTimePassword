@@ -1,0 +1,46 @@
+﻿<Window x:Class="Bau.Libraries.BauOTP.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bau.Libraries.BauOTP"
+        mc:Ignorable="d"
+        Title="BauOtp" Height="450" Width="800" Loaded="Window_Loaded">
+    <Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<ToolBarTray x:Name="tbMain" Grid.Column="0" Grid.Row="0">
+			<ToolBar BandIndex="1">
+				<Button ToolTip="New" Command="{Binding Path=NewCommand}" Margin="2">
+					<Image Width="16" Height="16" Source="/Resources/Accept.png" />
+				</Button>
+				<Button ToolTip="Open" Command="{Binding Path=OpenCommand}" Margin="2">
+					<Image Width="16" Height="16" Source="/Resources/Search.png" />
+				</Button>
+				<Button ToolTip="Delete" Command="{Binding Path=DeleteCommand}" Margin="2">
+					<Image Width="16" Height="16" Source="/Resources/Delete.png" />
+				</Button>
+			</ToolBar>
+		</ToolBarTray>
+		<ListView Grid.Row="1" Grid.Column="0" Margin="5" ItemsSource="{Binding Path=OtpListViewModel.Items}" SelectedItem="{Binding Path=OtpListViewModel.SelectedItem}">
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Width="500" Header="Application">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock Margin="5" VerticalAlignment="Center" HorizontalAlignment="Left" 
+									FontSize="18"
+									Text="{Binding Path=Text}" />
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+				</GridView>
+			</ListView.View>
+		</ListView>
+	</Grid>
+</Window>

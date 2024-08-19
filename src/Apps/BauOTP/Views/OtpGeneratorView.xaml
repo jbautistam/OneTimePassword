@@ -1,0 +1,111 @@
+﻿<Window x:Class="Bau.Libraries.BauOTP.Views.OtpGeneratorView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bau.Libraries.BauOTP.Views"
+		xmlns:converters="clr-namespace:Bau.Libraries.BauMvvm.Views.Converters;assembly=BauMvvm.Views"
+        mc:Ignorable="d"
+        Title="Otp Generator" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" WindowStyle="ToolWindow" ShowInTaskbar="False">
+	<Grid>
+		<Grid.Resources>
+			<converters:MVVMColorConverter x:Key="MVVMColorConverter"/>
+		</Grid.Resources>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<GroupBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Header="Properties">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<Label Grid.Row="0" Grid.Column="0" Margin="5" Content="Name:"/>
+				<TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="5" VerticalContentAlignment="Center" Text="{Binding Path=Name,UpdateSourceTrigger=PropertyChanged}"/>
+				<Label Grid.Row="1" Grid.Column="0" Margin="5" Content="Secret:"/>
+				<TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding Path=Key,UpdateSourceTrigger=PropertyChanged}"/>
+				<Label Grid.Row="1" Grid.Column="2" Margin="5" Content="Encoding:"/>
+				<ComboBox Grid.Row="1" Grid.Column="3" Margin="5"
+						  ItemsSource="{Binding ComboEncodings.Items}" DisplayMemberPath="Text" 
+						  SelectedItem="{Binding ComboEncodings.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<Label Grid.Row="2" Grid.Column="0" Margin="5" Content="Digits:"/>
+				<TextBox Grid.Row="2" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding Path=Digits,UpdateSourceTrigger=PropertyChanged}"/>
+				<Label Grid.Row="2" Grid.Column="2" Margin="5" Content="Hash algorithm:"/>
+				<ComboBox Grid.Row="2" Grid.Column="3" Margin="5"
+						  ItemsSource="{Binding ComboShaAlgorithms.Items}" DisplayMemberPath="Text" 
+						  SelectedItem="{Binding ComboShaAlgorithms.SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+			</Grid>
+		</GroupBox>
+		<GroupBox Grid.Row="1" Grid.Column="0" Header="HOTP">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<Label Grid.Row="0" Grid.Column="0" Margin="5" Content="Counter:"/>
+				<TextBox Grid.Row="0" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" Text="{Binding Path=Counter,UpdateSourceTrigger=PropertyChanged}"/>
+				<TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Path=HotpCode}" 
+					HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
+			</Grid>
+		</GroupBox>
+		<GroupBox Grid.Row="1" Grid.Column="1" Header="TOTP">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="4*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				<Label Grid.Row="0" Grid.Column="0" Margin="5" Content="Interval:"/>
+				<TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" 
+					VerticalContentAlignment="Center" Text="{Binding Path=Interval,UpdateSourceTrigger=PropertyChanged}"/>
+				<TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Path=TotpCode}" 
+					HorizontalAlignment="Center" FontSize="20" FontWeight="Bold"/>
+				<TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Path=RemainingTime}" 
+					HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"
+					Foreground="{Binding Path=RemainingTimeColor,Converter={StaticResource MVVMColorConverter}}" 
+					/>
+			</Grid>
+		</GroupBox>
+		<Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" FontSize="14" Foreground="Red" Content="{Binding Path=Error}"/>
+		<StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+			<Button Command="{Binding Path=SaveCommand}" IsDefault="True" Margin="5">
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+					<Image Width="16" Height="16" Source="/Resources/Accept.png" />
+					<TextBlock Margin="5" Text="Save"/>
+				</StackPanel>
+			</Button>
+			<Button Command="{Binding Path=CancelCommand}" IsCancel="True" Margin="5">
+				<StackPanel Orientation="Horizontal">
+					<Image Width="16" Height="16" Source="/Resources/Delete.png" />
+					<TextBlock Margin="5" Text="Cancel"/>
+				</StackPanel>
+			</Button>
+		</StackPanel>
+	</Grid>
+</Window>
