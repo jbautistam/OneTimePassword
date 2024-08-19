@@ -11,7 +11,8 @@ public class TestGenerator
 	private Random _rnd = new();
 
 	/// <summary>
-	///		Crea diferentes teorías para <see cref="TotpGenerator"/>
+	///		Crea diferentes teorías para <see cref="TotpGenerator_Should"/> y <see cref="HotpGenerator_Should"/>: 
+	///		escribe las cadenas de InlineData sobre la consola de depuración
 	/// </summary>
 	[Fact(Skip = "Use when generate inlinedata for tests")]
 	public void Generate_Theories_Totp()
