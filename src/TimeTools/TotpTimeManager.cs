@@ -43,7 +43,7 @@ public class TotpTimeManager
     /// <summary>
     ///     Segundos restantes en la ventana de tiempo actual
     /// </summary>
-    public int RemainingSeconds(DateTime? timestamp = null)
+    public int GetRemainingSeconds(DateTime? timestamp = null)
     {
         return IntervalSeconds - ((int) ((GetCorrectedTime(timestamp).Ticks - EpochTicks) / TicksToSeconds)) % IntervalSeconds;
     }
