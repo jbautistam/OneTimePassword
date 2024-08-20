@@ -195,6 +195,10 @@ string code = totp.Compute(DateTime.UtcNow);
 int remainingSeconds = totp.TimeManager.GetRemainingSeconds(DateTime.UtcNow);
 ```
 
+## Aplicación de ejemplo
+
+Para probar la librería y comprobar sus funcionalidades, se puede utilizar la aplicación de ejemplo [BauOtp](https://github.com/jbautistam/BauOTP)
+
 ## Créditos
 
 Este proyecto se basa en [Otp.Net](https://github.com/kspearrin/Otp.NET) desarrollado por [Kyle Spearrin](https://github.com/kspearrin).
